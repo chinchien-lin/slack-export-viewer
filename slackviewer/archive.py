@@ -6,10 +6,24 @@ import io
 
 from os.path import basename, splitext
 
+import requests
+
 import slackviewer
 from slackviewer.constants import SLACKVIEWER_TEMP_PATH
 from slackviewer.utils.six import to_unicode, to_bytes
 
+def download_file(url, local_file):
+    # Send an HTTP request to the given URL
+    with requests.get(url, stream=True) as r:
+        # Raise an HTTPError for bad responses
+        r.raise_for_status()
+
+        with open(local_file, 'wb') as f:
+            # Write the content to the local file in chunks
+            for chunk in r.iter_content(chunk_size=8192):
+                f.write(chunk)
+
+    return local_file
 
 def SHA1_file(filepath, extra=b''):
     """
