@@ -46,10 +46,13 @@ def SHA1_file(filepath, extra=b''):
 
 
 def extract_archive(filepath):
+def extract_archive(filepath, extracted_path=None):
     """
     Returns the path of the archive
 
     :param str filepath: Path to file to extract or read
+
+    :param str extracted_path: path of the archive
 
     :return: path of the archive
 
@@ -92,7 +95,6 @@ def extract_archive(filepath):
                 info.filename = info.filename.encode("cp437").decode("utf-8")
                 print(info.filename)
                 zip.extract(info,path=extracted_path)
-
 
         print("{} extracted to {}".format(filepath, extracted_path))
 
