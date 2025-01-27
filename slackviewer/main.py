@@ -1,5 +1,6 @@
 import webbrowser
 import os
+import tempfile
 
 import click
 import flask
@@ -59,6 +60,9 @@ def configure_app(app, archive, channels, no_sidebar, no_external_references, de
               help="Output directory for static HTML files.")
 @click.option("--html-only", is_flag=True, default=False, 
               help="If you want static HTML only, set this.")
+@click.option("-c", "--cache", type=click.Path(),
+              default=envvar('SLACKVIEWER_TEMP_PATH', ''),
+              help="Path to your archive cache (directory)")
 
 def main(
     port, 
@@ -71,10 +75,17 @@ def main(
     test, 
     debug, 
     output_dir, 
-    html_only
+    html_only,
+    cache
     ):
     if not archive:
         raise ValueError("Empty path provided for archive")
+
+    if cache:
+        os.environ["SLACKVIEWER_TEMP_PATH"] = os.path.join(cache, "_slackviewer")
+    else:
+        os.environ["SLACKVIEWER_TEMP_PATH"] = os.path.join(tempfile.gettempdir(), "_slackviewer")
+
 
     configure_app(app, archive, channels, no_sidebar, no_external_references, debug)
 

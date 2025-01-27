@@ -23,13 +23,13 @@ def cli():
               help="Actually performs file deletion")
 def clean(wet):
     if wet:
-        if os.path.exists(SLACKVIEWER_TEMP_PATH):
-            print("Removing {}...".format(SLACKVIEWER_TEMP_PATH))
-            shutil.rmtree(SLACKVIEWER_TEMP_PATH)
+        if os.path.exists(os.environ["SLACKVIEWER_TEMP_PATH"]):
+            print("Removing {}...".format(os.environ["SLACKVIEWER_TEMP_PATH"]))
+            shutil.rmtree(os.environ["SLACKVIEWER_TEMP_PATH"])
         else:
-            print("Nothing to remove! {} does not exist.".format(SLACKVIEWER_TEMP_PATH))
+            print("Nothing to remove! {} does not exist.".format(os.environ["SLACKVIEWER_TEMP_PATH"]))
     else:
-        print("Run with -w to remove {}".format(SLACKVIEWER_TEMP_PATH))
+        print("Run with -w to remove {}".format(os.environ["SLACKVIEWER_TEMP_PATH"]))
 
 
 @cli.command(help="Generates a single-file printable export for an archive file or directory")

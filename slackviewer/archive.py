@@ -61,7 +61,11 @@ def extract_archive(filepath):
         extra=to_bytes(slackviewer.__version__)
     )
 
-    extracted_path = os.path.join(SLACKVIEWER_TEMP_PATH, archive_sha)
+    if not extracted_path:
+        try:
+            extracted_path = os.path.join(os.getenv('SLACKVIEWER_TEMP_PATH'), archive_sha)
+        except:
+            extracted_path = os.path.join(SLACKVIEWER_TEMP_PATH, archive_sha)
 
     if os.path.exists(extracted_path):
         print("{} already exists".format(extracted_path))
