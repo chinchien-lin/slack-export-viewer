@@ -71,7 +71,35 @@ def SHA1_file(filepath, extra=b''):
     return h.hexdigest()
 
 
-def extract_archive(filepath):
+def download_avatars(data, dest_dir):
+    dest_dir = dest_dir.joinpath("avatars")
+    dest_dir.mkdir(exist_ok=True)
+
+    image_fields = ["image_original", "image_24", "image_32", "image_48", "image_72", "image_192", "image_512", "image_1024"]
+    for user_idx, user in enumerate(data):
+        user_profile = user.get("profile")
+        if not user_profile:
+            continue
+
+        for idx, image_field in enumerate(image_fields):
+            remote_url = user_profile.get(image_field)
+            if remote_url:
+                filename = urlparse(remote_url).path.split("/")[-1]
+
+                file_path_local = dest_dir.joinpath(filename)
+                file_path_local = truncate_path(file_path_local)
+                file_path_local.parent.mkdir(parents=True, exist_ok=True)
+
+                download_file(remote_url, str(file_path_local))
+
+                # replace remote url with local url
+                base_path = file_path_local.parent.parent.parent
+                file_path_relative = file_path_local.relative_to(base_path)
+                data[user_idx]["profile"][idx] = str(file_path_relative)
+                print("downloaded to " + str(file_path_relative))
+
+
+
 def download_files(data, files, item_idx, dest_dir):
     """
     Downloads & saves files
@@ -126,6 +154,8 @@ def download_files(data, files, item_idx, dest_dir):
 
                 print("Remote URL - " + url_field + ": " + str(url))
                 print("local URL: " + str(file_path_relative))
+
+
 def extract_archive(filepath, extracted_path=None):
     """
     Returns the path of the archive
@@ -197,6 +227,8 @@ def extract_archive(filepath, extracted_path=None):
         with open(json_file, "r", encoding="cp866") as f:
             data = json.load(f)
 
+        # if "users.json" in json_file:
+        #     download_avatars(data, file_dir)
 
         for item_idx, item in enumerate(data):
             download_files(data, item.get("files"), item_idx, file_dir)
