@@ -11,6 +11,8 @@ from slackviewer.reader import Reader
 from slackviewer.archive import get_export_info
 from jinja2 import Environment, PackageLoader
 
+from slackviewer import export
+
 
 @click.group()
 def cli():
@@ -51,5 +53,17 @@ def export(archive_dir):
         source_file=export_file_info["basename"],
         channels=channel_list
     )
-    with open(export_file_info['stripped_name'] + '.html', 'w') as outfile:
-        outfile.write(html.encode('utf-8'))
+    outfile = open(export_file_info["stripped_name"] + '.html', 'wb')
+    outfile.write(html.encode('utf-8'))
+
+
+@cli.command(help="Generates multiple printable export files for an archive file or directory")
+@click.option("-z", "--archive", type=click.Path(), required=True,
+              default=envvar('SEV_ARCHIVE', ''),
+              help="Path to your Slack export archive (.zip file or directory)")
+@click.option("-s", "--save", type=click.Path(),
+              help="Path to your output directory")
+@click.option("-c", "--cache", type=click.Path(),
+              help="Path to your archive cache directory")
+def export_multi(archive, save_dir=None, cache_dir=None):
+    export.export_multi(archive, save_dir, cache_dir)
